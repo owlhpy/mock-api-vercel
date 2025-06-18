@@ -1,0 +1,33 @@
+name: Generate Mock API
+
+on:
+  push:
+    paths:
+      - 'mock-schemas/**.json'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Generate API from Schemas
+        run: node scripts/generateApi.js
+
+      - name: Commit and Push API files
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add api/*.js
+          git commit -m "chore: auto generate api from schema" || echo "Nothing to commit"
+          git push
